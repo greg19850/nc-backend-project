@@ -13,7 +13,13 @@ describe('app', () => {
         .get('/api/topics')
         .expect(200)
         .then(({ body }) => {
-          console.log(body);
+          const { topics } = body;
+
+          expect(Array.isArray(topics)).toBe(true);
+          topics.forEach(topic => {
+            expect(topic.hasOwnProperty('slug')).toBe(true);
+            expect(topic.hasOwnProperty('description')).toBe(true);
+          });
         });
     });
   });
