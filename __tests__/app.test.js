@@ -168,16 +168,26 @@ describe('app', () => {
           });
         });
     });
-    it('200: GET returns article objects sorted by date', () => {
+    it('200: GET responds with empty array of comments when article_id is valid, but has no comments', () => {
+      return request(app)
+        .get('/api/articles/2/comments')
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+
+          expect(comments).toHaveLength(0);
+        });
+    });
+    it('200: GET returns comments objects sorted by date', () => {
       return request(app)
         .get('/api/articles/1/comments?sort_by=created_at')
         .expect(200)
         .then(({ body }) => {
           const { comments } = body;
-
           expect(comments).toBeSortedBy('created_at');
         });
     });
+
     it('400: GET responds with error, when invalid article_id is passed', () => {
       return request(app)
         .get('/api/articles/not_valid_id/comments')
