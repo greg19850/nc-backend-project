@@ -1,4 +1,4 @@
-const { fetchTopics, fetchArticles, fetchArticleById } = require('../models/newsModels');
+const { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsByArticleId, checkArticleIdExist } = require('../models/newsModels');
 
 exports.getTopics = (req, res, next) => {
   fetchTopics().then((topics) => {
@@ -23,6 +23,20 @@ exports.getArticleById = (req, res, next) => {
 
   fetchArticleById(article_id).then((article) => {
     res.status(200).send({ article });
+  }).catch((err) => {
+    next(err);
+  });
+};
+
+exports.getCommentsByArticleId = (req, res, next) => {
+  const { article_id } = req.params;
+  const { sort_by } = req.query;
+
+  const checkArticlePromise = checkArticleIdExist(article_id);
+  const commentsPromise = fetchCommentsByArticleId(article_id, sort_by);
+
+  Promise.all([commentsPromise, checkArticlePromise]).then(([comments]) => {
+    res.status(200).send({ comments });
   }).catch((err) => {
     next(err);
   });

@@ -135,5 +135,82 @@ describe('app', () => {
           expect(body.msg).toBe('Article Not Found!');
         });
     });
+    it('400: GET responds with error, if invalid sort_by query is used', () => {
+      return request(app)
+        .get('/api/articles?sort_by=something&order=DESC')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid sort query parameters');
+        });
+    });
+  });
+
+  describe('/api/articles/:article_id/comments', () => {
+    it('200: GET responds with array of comments for given article_id', () => {
+      return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+
+          expect(Array.isArray(comments)).toBe(true);
+          expect(comments).toHaveLength(11);
+
+          comments.forEach(comment => {
+            expect(comment).toMatchObject({
+              comment_id: expect.any(Number),
+              body: expect.any(String),
+              article_id: expect.any(Number),
+              author: expect.any(String),
+              votes: expect.any(Number),
+              created_at: expect.any(String)
+            });
+          });
+        });
+    });
+    it('200: GET responds with empty array of comments when article_id is valid, but has no comments', () => {
+      return request(app)
+        .get('/api/articles/2/comments')
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+
+          expect(comments).toHaveLength(0);
+        });
+    });
+    it('200: GET returns comments objects sorted by date', () => {
+      return request(app)
+        .get('/api/articles/1/comments?sort_by=created_at')
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+          expect(comments).toBeSortedBy('created_at');
+        });
+    });
+
+    it('400: GET responds with error, when invalid article_id is passed', () => {
+      return request(app)
+        .get('/api/articles/not_valid_id/comments')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid Path Request');
+        });
+    });
+    it('404: GET responds with error message, for valid, but not existing article_id', () => {
+      return request(app)
+        .get('/api/articles/1000/comments')
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Article Not Found!');
+        });
+    });
+    it('400: GET responds with error, if invalid sort_by query is used', () => {
+      return request(app)
+        .get('/api/articles/1/comments?sort_by=invalidQuery')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid sort query parameters');
+        });
+    });
   });
 });
