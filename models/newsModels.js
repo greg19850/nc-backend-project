@@ -50,13 +50,21 @@ exports.fetchArticleById = (article_id) => {
   });
 };
 
-exports.fetchCommentsByArticleId = (id) => {
+exports.fetchCommentsByArticleId = (id, sort_by) => {
+  if (sort_by && !['created_at'].includes(sort_by)) {
+    return Promise.reject('Invalid sort query');
+  }
+
   let queryString = 'SELECT * FROM comments';
   const queryParams = [];
 
   if (id !== undefined) {
     queryString += ' WHERE article_id = $1';
     queryParams.push(id);
+  }
+
+  if (sort_by) {
+    queryString += ` ORDER BY ${sort_by}`;
   }
 
   return db.query(queryString, queryParams)

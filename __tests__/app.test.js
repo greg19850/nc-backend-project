@@ -135,6 +135,14 @@ describe('app', () => {
           expect(body.msg).toBe('Article Not Found!');
         });
     });
+    it('400: GET responds with error, if invalid sort_by query is used', () => {
+      return request(app)
+        .get('/api/articles?sort_by=something&order=DESC')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid sort query parameters');
+        });
+    });
   });
 
   describe('/api/articles/:article_id/comments', () => {
@@ -160,6 +168,16 @@ describe('app', () => {
           });
         });
     });
+    it('200: GET returns article objects sorted by date', () => {
+      return request(app)
+        .get('/api/articles/1/comments?sort_by=created_at')
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+
+          expect(comments).toBeSortedBy('created_at');
+        });
+    });
     it('400: GET responds with error, when invalid article_id is passed', () => {
       return request(app)
         .get('/api/articles/not_valid_id/comments')
@@ -174,6 +192,14 @@ describe('app', () => {
         .expect(404)
         .then(({ body }) => {
           expect(body.msg).toBe('Article Not Found!');
+        });
+    });
+    it('400: GET responds with error, if invalid sort_by query is used', () => {
+      return request(app)
+        .get('/api/articles/1/comments?sort_by=invalidQuery')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid sort query parameters');
         });
     });
   });

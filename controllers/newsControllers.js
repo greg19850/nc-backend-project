@@ -30,8 +30,9 @@ exports.getArticleById = (req, res, next) => {
 
 exports.getCommentsByArticleId = (req, res, next) => {
   const { article_id } = req.params;
+  const { sort_by } = req.query;
 
-  fetchCommentsByArticleId(article_id).then((comments) => {
+  fetchCommentsByArticleId(article_id, sort_by).then((comments) => {
     res.status(200).send({ comments });
   }).catch((err) => {
     next(err);
