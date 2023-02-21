@@ -22,7 +22,7 @@ describe('app', () => {
           const { topics } = body;
 
           expect(Array.isArray(topics)).toBe(true);
-          expect(topics.length).toBe(3);
+          expect(topics).toHaveLength(3);
           topics.forEach(topic => {
             expect(topic.hasOwnProperty('slug')).toBe(true);
             expect(topic.hasOwnProperty('description')).toBe(true);
@@ -30,6 +30,48 @@ describe('app', () => {
         });
     });
   });
+
+  describe('/api/articles', () => {
+    it('200: GET returns array of article objects', () => {
+      return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(Array.isArray(articles)).toBe(true);
+          expect(articles).toHaveLength(12);
+          articles.forEach(article => {
+            expect(article.hasOwnProperty('title')).toBe(true);
+            expect(article.hasOwnProperty('article_id')).toBe(true);
+            expect(article.hasOwnProperty('topic')).toBe(true);
+          });
+        });
+    });
+    it('200: GET returns each object with comment_count property - total count of comments with this article_id', () => {
+      return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          articles.forEach(article => {
+            expect(article.hasOwnProperty('comment_count')).toBe(true);
+          });
+        });
+    });
+    it('200: GET returns article objects sorted by date, in descending order', () => {
+      return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+
+          expect(articles).toBeSortedBy('created_at', {
+            descending: true,
+          });
+        });
+    });
+  });
+
   describe('/api/badPath', () => {
     it('404: GET returns not found if incorrect path given', () => {
       return request(app)
