@@ -60,7 +60,7 @@ describe('app', () => {
     });
     it('200: GET returns article objects sorted by date, in descending order', () => {
       return request(app)
-        .get('/api/articles')
+        .get('/api/articles?sort_by=created_at&order=DESC')
         .expect(200)
         .then(({ body }) => {
           const { articles } = body;
@@ -68,6 +68,22 @@ describe('app', () => {
           expect(articles).toBeSortedBy('created_at', {
             descending: true,
           });
+        });
+    });
+    it('400: GET prevents SQL injection, if user tries to input sort parameter', () => {
+      return request(app)
+        .get('/api/articles?sort_by=something&order=DESC')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid sort query parameters');
+        });
+    });
+    it('400: GET prevents SQL injection, if user tries to input order parameter', () => {
+      return request(app)
+        .get('/api/articles?sort_by=created_at&order=notRight')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid order query parameters');
         });
     });
   });
