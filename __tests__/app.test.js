@@ -88,6 +88,16 @@ describe('app', () => {
     });
   });
 
+  // describe('/api/articles/:article_id/comments', () => {
+  //   it('200: GET responds with array of comments for given article_id', () => {
+  //     return request(app)
+  //       .get('/api/articles/2/comments')
+  //       .expect(200)
+  //       .then(({ body }) => {
+  //         console.log(body.comments);
+  //       });
+  //   });
+  // });
   describe('/api/badPath', () => {
     it('404: GET responds with not found error, if incorrect path given', () => {
       return request(app)

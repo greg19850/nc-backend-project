@@ -34,3 +34,7 @@ exports.fetchArticles = (sort_by, order) => {
       return result.rows;
     });
 };
+
+exports.fetchCommentsByArticleId = (id) => {
+  return db.query();
+};
