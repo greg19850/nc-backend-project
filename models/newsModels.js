@@ -7,3 +7,7 @@ exports.fetchTopics = () => {
       return result.rows;
     });
 };
+
+exports.fetchArticleById = () => {
+
+};
