@@ -13,6 +13,17 @@ afterAll(() => {
 });
 
 describe('app', () => {
+  describe('Server Error - bad path', () => {
+    it('404: GET responds with not found error, if incorrect path given', () => {
+      return request(app)
+        .get('/api/badPath')
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Path not found');
+        });
+    });
+  });
+
   describe('/api/topics', () => {
     it('200: GET returns array of topic objects, each with slug, and description properties', () => {
       return request(app)
@@ -88,23 +99,81 @@ describe('app', () => {
     });
   });
 
-  // describe('/api/articles/:article_id/comments', () => {
-  //   it('200: GET responds with array of comments for given article_id', () => {
-  //     return request(app)
-  //       .get('/api/articles/2/comments')
-  //       .expect(200)
-  //       .then(({ body }) => {
-  //         console.log(body.comments);
-  //       });
-  //   });
-  // });
-  describe('/api/badPath', () => {
-    it('404: GET responds with not found error, if incorrect path given', () => {
+  describe('/api/articles/:article_id', () => {
+    it('200: GET responds with object of single article', () => {
       return request(app)
-        .get('/api/badPath')
+        .get('/api/articles/3')
+        .expect(200)
+        .then(({ body: { article } }) => {
+          expect(article).toEqual(
+            {
+              article_id: 3,
+              title: 'Eight pug gifs that remind me of mitch',
+              topic: 'mitch',
+              author: 'icellusedkars',
+              body: 'some gifs',
+              created_at: '2020-11-03T08:12:00.000Z',
+              votes: 0,
+              article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
+            }
+          );
+        });
+    });
+    it('400: GET responds with error, when invalid article_id is passed', () => {
+      return request(app)
+        .get('/api/articles/not_valid_id')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid Path Request');
+        });
+    });
+    it('404: GET responds with error message, for valid, but not existing article_id', () => {
+      return request(app)
+        .get('/api/articles/1000')
         .expect(404)
         .then(({ body }) => {
-          expect(body.msg).toBe('Path not found');
+          expect(body.msg).toBe('Article Not Found!');
+        });
+    });
+  });
+
+  describe('/api/articles/:article_id/comments', () => {
+    it('200: GET responds with array of comments for given article_id', () => {
+      return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+
+          expect(Array.isArray(comments)).toBe(true);
+          expect(comments).toHaveLength(11);
+
+          comments.forEach(comment => {
+            expect(comment).toMatchObject({
+              comment_id: expect.any(Number),
+              body: expect.any(String),
+              article_id: expect.any(Number),
+              author: expect.any(String),
+              votes: expect.any(Number),
+              created_at: expect.any(String)
+            });
+          });
+        });
+    });
+    it('400: GET responds with error, when invalid article_id is passed', () => {
+      return request(app)
+        .get('/api/articles/not_valid_id/comments')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid Path Request');
+        });
+    });
+    it('404: GET responds with error message, for valid, but not existing article_id', () => {
+      return request(app)
+        .get('/api/articles/1000/comments')
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Article Not Found!');
         });
     });
   });

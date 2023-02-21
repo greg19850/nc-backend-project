@@ -8,6 +8,7 @@ exports.fetchTopics = () => {
     });
 };
 
+
 exports.fetchArticles = (sort_by, order) => {
 
   if (sort_by && !['created_at'].includes(sort_by)) {
@@ -35,6 +36,35 @@ exports.fetchArticles = (sort_by, order) => {
     });
 };
 
+exports.fetchArticleById = (article_id) => {
+  return db.query(
+    `SELECT * FROM articles
+    WHERE article_id=$1
+    `, [article_id]
+  ).then((result) => {
+    if (result.rowCount === 0) {
+      return Promise.reject('could not find article');
+    }
+
+    return result.rows[0];
+  });
+};
+
 exports.fetchCommentsByArticleId = (id) => {
-  return db.query();
+  let queryString = 'SELECT * FROM comments';
+  const queryParams = [];
+
+  if (id !== undefined) {
+    queryString += ' WHERE article_id = $1';
+    queryParams.push(id);
+  }
+
+  return db.query(queryString, queryParams)
+    .then((result) => {
+      if (result.rowCount === 0) {
+        return Promise.reject('could not find article');
+      }
+
+      return result.rows;
+    });
 };
