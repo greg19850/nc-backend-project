@@ -70,7 +70,7 @@ describe('app', () => {
           });
         });
     });
-    it('400: GET prevents SQL injection, if user tries to input sort parameter', () => {
+    it('400: GET responds with error, if invalid sort_by query is used', () => {
       return request(app)
         .get('/api/articles?sort_by=something&order=DESC')
         .expect(400)
@@ -78,7 +78,7 @@ describe('app', () => {
           expect(body.msg).toBe('Invalid sort query parameters');
         });
     });
-    it('400: GET prevents SQL injection, if user tries to input order parameter', () => {
+    it('400: GET responds with error, if invalid order query is used', () => {
       return request(app)
         .get('/api/articles?sort_by=created_at&order=notRight')
         .expect(400)
@@ -89,7 +89,7 @@ describe('app', () => {
   });
 
   describe('/api/badPath', () => {
-    it('404: GET returns not found if incorrect path given', () => {
+    it('404: GET responds with not found error, if incorrect path given', () => {
       return request(app)
         .get('/api/badPath')
         .expect(404)
