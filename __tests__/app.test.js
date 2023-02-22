@@ -143,6 +143,56 @@ describe('app', () => {
           expect(body.msg).toBe('Invalid sort query parameters');
         });
     });
+
+    it('200: PATCH responds with updated article', () => {
+      return request(app)
+        .patch('/api/articles/1')
+        .send({ inc_votes: 100 })
+        .expect(200)
+        .then(({ body }) => {
+          const { article } = body;
+
+          expect(article.votes).toBe(100);
+        });
+    });
+    it('200: PATCH responds with original votes decremented, if negative value is send', () => {
+      return request(app)
+        .patch('/api/articles/1')
+        .send({ inc_votes: -50 })
+        .expect(200)
+        .then(({ body }) => {
+          const { article } = body;
+
+          expect(article.votes).toBe(-50);
+        });
+    });
+    it('400: PATCH responds with error, when invalid article_id is passed', () => {
+      return request(app)
+        .patch('/api/articles/not_valid_id')
+        .send({ inc_votes: 100 })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid Path Request');
+        });
+    });
+    it('404: PATCH responds with error message, for valid, but not existing article_id', () => {
+      return request(app)
+        .patch('/api/articles/1000')
+        .send({ inc_votes: 100 })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Article Not Found!');
+        });
+    });
+    it('400: PATCH responds with error message, for votes passed in wrong format', () => {
+      return request(app)
+        .patch('/api/articles/1')
+        .send({ inc_votes: 'abc' })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Bad Request');
+        });
+    });
   });
 
   describe('/api/articles/:article_id/comments', () => {
