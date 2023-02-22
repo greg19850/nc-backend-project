@@ -45,9 +45,14 @@ exports.getCommentsByArticleId = (req, res, next) => {
 exports.addCommentToArticle = (req, res, next) => {
   const newComment = req.body;
   const { article_id } = req.params;
-  insertNewComment(newComment, article_id).then((comment) => {
-    res.status(201).send({ comment });
-  }).catch((err) => {
-    next(err);
-  });
+
+  const checkArticlePromise = checkArticleIdExist(article_id);
+  const commentsPromise = insertNewComment(newComment, article_id);
+
+  Promise.all([commentsPromise, checkArticlePromise])
+    .then(([comment]) => {
+      res.status(201).send({ comment });
+    }).catch((err) => {
+      next(err);
+    });
 };

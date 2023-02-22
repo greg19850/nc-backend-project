@@ -95,6 +95,7 @@ exports.checkArticleIdExist = (article_id) => {
 
 exports.insertNewComment = (newComment, article_id) => {
 
+
   return db.query(
     `
     INSERT INTO comments
