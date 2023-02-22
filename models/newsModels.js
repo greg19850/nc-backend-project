@@ -107,3 +107,21 @@ exports.insertNewComment = (newComment, article_id) => {
       return result.rows[0];
     });
 };
+
+exports.fetchUpdatedVotes = (newVotes, articleId) => {
+
+  if (typeof newVotes !== 'number') {
+    return Promise.reject('Invalid data type');
+  }
+
+  return db.query(
+    `
+    UPDATE articles
+    SET votes= $1 WHERE article_id = $2
+    RETURNING *;
+    `, [newVotes, articleId]
+  )
+    .then((result) => {
+      return result.rows[0];
+    });
+};

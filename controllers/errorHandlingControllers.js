@@ -18,6 +18,8 @@ exports.handleCustomErrors = (err, req, res, next) => {
     res.status(400).send({ msg: 'Invalid order query parameters' });
   } else if (err === 'could not find article') {
     res.status(404).send({ msg: 'Article Not Found!' });
+  } else if (err === 'Invalid data type') {
+    res.status(400).send({ msg: 'Bad Request' });
   } else {
     next(err);
   }

@@ -1,5 +1,5 @@
 const express = require('express');
-const { getTopics, getArticles, getArticleById, getCommentsByArticleId, addCommentToArticle } = require('./controllers/newsControllers');
+const { getTopics, getArticles, getArticleById, getCommentsByArticleId, addCommentToArticle, addVotesToArticle } = require('./controllers/newsControllers');
 const { handlePSQL400Errors, handle500Status, handleCustomErrors } = require('./controllers/errorHandlingControllers');
 
 
@@ -13,6 +13,8 @@ app.get('/api/articles/:article_id', getArticleById);
 app.get('/api/articles/:article_id/comments', getCommentsByArticleId);
 
 app.post('/api/articles/:article_id/comments', addCommentToArticle);
+
+app.patch('/api/articles/:article_id', addVotesToArticle);
 
 
 app.use('*', (req, res, next) => {
