@@ -184,7 +184,7 @@ describe('app', () => {
           expect(body.msg).toBe('Article Not Found!');
         });
     });
-    it.only('400: PATCH responds with error message, for votes passed in wrong format', () => {
+    it('400: PATCH responds with error message, for votes passed in wrong format', () => {
       return request(app)
         .patch('/api/articles/1')
         .send({ inc_votes: 'abc' })
