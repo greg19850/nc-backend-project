@@ -225,6 +225,17 @@ describe('app', () => {
           expect(comment.body).toBe('All good in the hood');
         });
     });
+    it('201: POST responds with new posted comment, extra fields are ignored', () => {
+      return request(app)
+        .post('/api/articles/1/comments')
+        .send({ author: 'icellusedkars', body: 'All good in the hood', extra: 'some extra stuff' })
+        .expect(201)
+        .then(({ body }) => {
+          const { comment } = body;
+
+          expect(comment.hasOwnProperty('extra')).toBe(false);
+        });
+    });
     it('400: GET responds with error, when invalid article_id is passed', () => {
       return request(app)
         .post('/api/articles/invalid_id/comments')
@@ -234,13 +245,12 @@ describe('app', () => {
           expect(body.msg).toBe('Invalid Path Request');
         });
     });
-    it('400: GET responds with error, when author field is empty', () => {
+    it('404: GET responds with error message, for valid, but not existing article_id', () => {
       return request(app)
-        .post('/api/articles/1/comments')
-        .send({ author: '', body: 'All good in the hood' })
-        .expect(400)
+        .get('/api/articles/1000/comments')
+        .expect(404)
         .then(({ body }) => {
-          expect(body.msg).toBe('Author field empty!');
+          expect(body.msg).toBe('Article Not Found!');
         });
     });
     it('400: GET responds with error, when body is empty', () => {
@@ -250,6 +260,15 @@ describe('app', () => {
         .expect(400)
         .then(({ body }) => {
           expect(body.msg).toBe('Comment body empty!');
+        });
+    });
+    it('404: GET responds with error, when author is not found', () => {
+      return request(app)
+        .post('/api/articles/1/comments')
+        .send({ author: 'Greg', body: 'All good in the hood' })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Author not found!');
         });
     });
   });
