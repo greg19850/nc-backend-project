@@ -1,6 +1,10 @@
 exports.handlePSQL400Errors = (err, req, res, next) => {
   if (err.code === '22P02') {
     res.status(400).send({ msg: 'Invalid Path Request' });
+  } else if (err.code === '23502') {
+    res.status(400).send({ msg: 'Comment body empty!' });
+  } else if (err.code === '23503') {
+    res.status(400).send({ msg: 'Author field empty!' });
   } else {
     next(err);
   }

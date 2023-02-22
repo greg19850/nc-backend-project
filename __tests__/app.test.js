@@ -212,5 +212,45 @@ describe('app', () => {
           expect(body.msg).toBe('Invalid sort query parameters');
         });
     });
+    it('201: POST responds with new posted comment', () => {
+      return request(app)
+        .post('/api/articles/1/comments')
+        .send({ author: 'icellusedkars', body: 'All good in the hood' })
+        .expect(201)
+        .then(({ body }) => {
+          const { comment } = body;
+
+          expect(comment.article_id).toBe(1);
+          expect(comment.author).toBe('icellusedkars');
+          expect(comment.body).toBe('All good in the hood');
+        });
+    });
+    it('400: GET responds with error, when invalid article_id is passed', () => {
+      return request(app)
+        .post('/api/articles/invalid_id/comments')
+        .send({ author: 'icellusedkars', body: 'All good in the hood' })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid Path Request');
+        });
+    });
+    it('400: GET responds with error, when author field is empty', () => {
+      return request(app)
+        .post('/api/articles/1/comments')
+        .send({ author: '', body: 'All good in the hood' })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Author field empty!');
+        });
+    });
+    it('400: GET responds with error, when body is empty', () => {
+      return request(app)
+        .post('/api/articles/1/comments')
+        .send({})
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Comment body empty!');
+        });
+    });
   });
 });
