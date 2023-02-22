@@ -4,7 +4,7 @@ exports.handlePSQL400Errors = (err, req, res, next) => {
   } else if (err.code === '23502') {
     res.status(400).send({ msg: 'Comment body empty!' });
   } else if (err.code === '23503') {
-    res.status(404).send({ msg: 'Author not found!' });
+    res.status(404).send({ msg: 'Data not found' });
   } else {
     next(err);
   }

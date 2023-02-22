@@ -269,7 +269,7 @@ describe('app', () => {
         .send({ author: 'Greg', body: 'All good in the hood' })
         .expect(404)
         .then(({ body }) => {
-          expect(body.msg).toBe('Author not found!');
+          expect(body.msg).toBe('Data not found');
         });
     });
   });
