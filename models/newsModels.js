@@ -1,4 +1,6 @@
 const db = require('../db/connection');
+const devArticles = require('../db/data/development-data/articles');
+const testArticles = require('../db/data/test-data/articles');
 
 exports.fetchTopics = () => {
   return db.query(`SELECT * FROM topics`)
@@ -11,7 +13,34 @@ exports.fetchTopics = () => {
 
 exports.fetchArticles = (sort_by = 'created_at', order = 'DESC', topic) => {
   const validSortColumns = ['title', 'topic', 'author', 'body', 'created_at', 'votes', 'article_img_url'];
-  const validTopics = ['mitch', 'cats'];
+  const validTopics = [];
+
+  devArticles.forEach(devArticle => {
+    let devTopic = '';
+    for (let key in devArticle) {
+      if (key === 'topic') {
+        devTopic = devArticle[key];
+      }
+    }
+
+    if (!validTopics.includes(devTopic)) {
+      validTopics.push(devTopic);
+    }
+  });
+
+  testArticles.forEach(testArticle => {
+    let testTopic = '';
+    for (let key in testArticle) {
+      if (key === 'topic') {
+        testTopic = testArticle[key];
+      }
+    }
+
+    if (!validTopics.includes(testTopic)) {
+      validTopics.push(testTopic);
+    }
+  });
+
 
   if (sort_by && !validSortColumns.includes(sort_by)) {
     return Promise.reject('Invalid sort query');
