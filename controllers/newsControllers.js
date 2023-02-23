@@ -1,4 +1,4 @@
-const { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsByArticleId, checkArticleIdExist, insertNewComment, fetchUpdatedVotes } = require('../models/newsModels');
+const { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsByArticleId, checkArticleIdExist, insertNewComment, fetchUpdatedVotes, fetchUsers } = require('../models/newsModels');
 
 exports.getTopics = (req, res, next) => {
   fetchTopics().then((topics) => {
@@ -69,4 +69,13 @@ exports.addVotesToArticle = (req, res, next) => {
     }).catch((err) => {
       next(err);
     });
+};
+
+exports.getUsers = (req, res, next) => {
+
+  fetchUsers().then(users => {
+    res.status(200).send({ users });
+  }).catch((err) => {
+    next(err);
+  });
 };
