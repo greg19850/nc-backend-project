@@ -43,7 +43,7 @@ describe('app', () => {
   });
 
   describe('/api/articles', () => {
-    it('200: GET returns array of article objects', () => {
+    it('200: GET returns array of article objects. Articles are, by default sorted by column: created_at, and ordered in descending order', () => {
       return request(app)
         .get('/api/articles')
         .expect(200)
@@ -55,6 +55,10 @@ describe('app', () => {
             expect(article.hasOwnProperty('title')).toBe(true);
             expect(article.hasOwnProperty('article_id')).toBe(true);
             expect(article.hasOwnProperty('topic')).toBe(true);
+          });
+
+          expect(articles).toBeSortedBy('created_at', {
+            descending: true,
           });
         });
     });
@@ -81,6 +85,41 @@ describe('app', () => {
           });
         });
     });
+    it('200: GET returns article objects filtered by topic', () => {
+      return request(app)
+        .get('/api/articles?topic=mitch')
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+
+          expect(articles).toHaveLength(11);
+          articles.forEach(article => {
+            expect(article.topic).toBe('mitch');
+          });
+
+        });
+    });
+    it('200: GET returns article objects sorted by any valid column', () => {
+      return request(app)
+        .get('/api/articles?sort_by=title')
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+
+          expect(articles).toBeSorted();
+        });
+    });
+    it('200: GET returns article objects ordered in any valid order: ascending or descending', () => {
+      return request(app)
+        .get('/api/articles?sort_by=title&order=ASC')
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+
+          expect(articles).toBeSortedBy('title');
+        });
+    });
+
     it('400: GET responds with error, if invalid sort_by query is used', () => {
       return request(app)
         .get('/api/articles?sort_by=something&order=DESC')
@@ -97,6 +136,14 @@ describe('app', () => {
           expect(body.msg).toBe('Invalid order query parameters');
         });
     });
+    it('400: GET responds with error, if invalid topic query is used', () => {
+      return request(app)
+        .get('/api/articles?topic=unknownTopic')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid topic query parameters');
+        });
+    });
   });
 
   describe('/api/articles/:article_id', () => {
@@ -105,7 +152,7 @@ describe('app', () => {
         .get('/api/articles/3')
         .expect(200)
         .then(({ body: { article } }) => {
-          expect(article).toEqual(
+          expect(article).toMatchObject(
             {
               article_id: 3,
               title: 'Eight pug gifs that remind me of mitch',
@@ -114,11 +161,22 @@ describe('app', () => {
               body: 'some gifs',
               created_at: '2020-11-03T08:12:00.000Z',
               votes: 0,
-              article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
+              article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
             }
           );
         });
     });
+    it('200: GET returns each object with comment_count property - total count of comments with this article_id', () => {
+      return request(app)
+        .get('/api/articles/1')
+        .expect(200)
+        .then(({ body }) => {
+          const { article } = body;
+
+          expect(article.hasOwnProperty('comment_count')).toBe(true);
+        });
+    });
+
     it('400: GET responds with error, when invalid article_id is passed', () => {
       return request(app)
         .get('/api/articles/not_valid_id')
@@ -127,6 +185,8 @@ describe('app', () => {
           expect(body.msg).toBe('Invalid Path Request');
         });
     });
+
+
     it('404: GET responds with error message, for valid, but not existing article_id', () => {
       return request(app)
         .get('/api/articles/1000')
@@ -143,6 +203,7 @@ describe('app', () => {
           expect(body.msg).toBe('Invalid sort query parameters');
         });
     });
+
 
     it('200: PATCH responds with updated article', () => {
       return request(app)

@@ -1,4 +1,6 @@
 const db = require('../db/connection');
+const devArticles = require('../db/data/development-data/articles');
+const testArticles = require('../db/data/test-data/articles');
 
 exports.fetchTopics = () => {
   return db.query(`SELECT * FROM topics`)
@@ -9,9 +11,38 @@ exports.fetchTopics = () => {
 };
 
 
-exports.fetchArticles = (sort_by, order) => {
+exports.fetchArticles = (sort_by = 'created_at', order = 'DESC', topic) => {
+  const validSortColumns = ['title', 'topic', 'author', 'body', 'created_at', 'votes', 'article_img_url'];
+  const validTopics = [];
 
-  if (sort_by && !['created_at'].includes(sort_by)) {
+  devArticles.forEach(devArticle => {
+    let devTopic = '';
+    for (let key in devArticle) {
+      if (key === 'topic') {
+        devTopic = devArticle[key];
+      }
+    }
+
+    if (!validTopics.includes(devTopic)) {
+      validTopics.push(devTopic);
+    }
+  });
+
+  testArticles.forEach(testArticle => {
+    let testTopic = '';
+    for (let key in testArticle) {
+      if (key === 'topic') {
+        testTopic = testArticle[key];
+      }
+    }
+
+    if (!validTopics.includes(testTopic)) {
+      validTopics.push(testTopic);
+    }
+  });
+
+
+  if (sort_by && !validSortColumns.includes(sort_by)) {
     return Promise.reject('Invalid sort query');
   }
 
@@ -19,29 +50,44 @@ exports.fetchArticles = (sort_by, order) => {
     return Promise.reject('Invalid order query');
   }
 
+  if (topic && !validTopics.includes(topic)) {
+    return Promise.reject('Invalid topic query');
+  }
+
   let queryString = `SELECT articles.*, COUNT(comments.comment_id) as comment_count
   FROM articles
   LEFT JOIN comments 
-  ON comments.article_id = articles.article_id
-  GROUP BY articles.article_id`;
+  ON comments.article_id = articles.article_id`;
+  const queryParams = [];
+
+  if (topic) {
+    queryString += ' WHERE topic = $1';
+    queryParams.push(topic);
+  }
+
+  queryString += ` GROUP BY articles.article_id`;
 
   if (sort_by && order) {
     queryString += ` ORDER BY ${sort_by} ${order}`;
   }
 
-  return db.query(queryString)
+  return db.query(queryString, queryParams)
     .then((result) => {
-
       return result.rows;
     });
 };
 
 exports.fetchArticleById = (article_id) => {
   return db.query(
-    `SELECT * FROM articles
-    WHERE article_id=$1
+    `SELECT articles.*, COUNT(comments.comment_id) as comment_count
+    FROM articles
+    LEFT JOIN comments 
+    ON comments.article_id = articles.article_id
+    WHERE articles.article_id=$1
+    GROUP BY articles.article_id
     `, [article_id]
   ).then((result) => {
+    console.log(result);
     if (result.rowCount === 0) {
       return Promise.reject('could not find article');
     }
