@@ -9,9 +9,11 @@ exports.fetchTopics = () => {
 };
 
 
-exports.fetchArticles = (sort_by, order) => {
+exports.fetchArticles = (sort_by = 'created_at', order = 'DESC', topic) => {
+  const validSortColumns = ['title', 'topic', 'author', 'body', 'created_at', 'votes', 'article_img_url'];
+  const validTopics = ['mitch', 'cats'];
 
-  if (sort_by && !['created_at'].includes(sort_by)) {
+  if (sort_by && !validSortColumns.includes(sort_by)) {
     return Promise.reject('Invalid sort query');
   }
 
@@ -19,19 +21,29 @@ exports.fetchArticles = (sort_by, order) => {
     return Promise.reject('Invalid order query');
   }
 
+  if (topic && !validTopics.includes(topic)) {
+    return Promise.reject('Invalid topic query');
+  }
+
   let queryString = `SELECT articles.*, COUNT(comments.comment_id) as comment_count
   FROM articles
   LEFT JOIN comments 
-  ON comments.article_id = articles.article_id
-  GROUP BY articles.article_id`;
+  ON comments.article_id = articles.article_id`;
+  const queryParams = [];
+
+  if (topic) {
+    queryString += ' WHERE topic = $1';
+    queryParams.push(topic);
+  }
+
+  queryString += ` GROUP BY articles.article_id`;
 
   if (sort_by && order) {
     queryString += ` ORDER BY ${sort_by} ${order}`;
   }
 
-  return db.query(queryString)
+  return db.query(queryString, queryParams)
     .then((result) => {
-
       return result.rows;
     });
 };
