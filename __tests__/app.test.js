@@ -43,7 +43,7 @@ describe('app', () => {
   });
 
   describe('/api/articles', () => {
-    it('200: GET returns array of article objects', () => {
+    it('200: GET returns array of article objects. Articles are, by default sorted by column: created_at, and ordered in descending order', () => {
       return request(app)
         .get('/api/articles')
         .expect(200)
@@ -55,6 +55,10 @@ describe('app', () => {
             expect(article.hasOwnProperty('title')).toBe(true);
             expect(article.hasOwnProperty('article_id')).toBe(true);
             expect(article.hasOwnProperty('topic')).toBe(true);
+          });
+
+          expect(articles).toBeSortedBy('created_at', {
+            descending: true,
           });
         });
     });
@@ -81,6 +85,41 @@ describe('app', () => {
           });
         });
     });
+    it('200: GET returns article objects filtered by topic', () => {
+      return request(app)
+        .get('/api/articles?topic=mitch')
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+
+          expect(articles).toHaveLength(11);
+          articles.forEach(article => {
+            expect(article.topic).toBe('mitch');
+          });
+
+        });
+    });
+    it('200: GET returns article objects sorted by any valid column', () => {
+      return request(app)
+        .get('/api/articles?sort_by=title')
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+
+          expect(articles).toBeSorted();
+        });
+    });
+    it('200: GET returns article objects ordered in any valid order: ascending or descending', () => {
+      return request(app)
+        .get('/api/articles?sort_by=title&order=ASC')
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+
+          expect(articles).toBeSortedBy('title');
+        });
+    });
+
     it('400: GET responds with error, if invalid sort_by query is used', () => {
       return request(app)
         .get('/api/articles?sort_by=something&order=DESC')
@@ -95,6 +134,14 @@ describe('app', () => {
         .expect(400)
         .then(({ body }) => {
           expect(body.msg).toBe('Invalid order query parameters');
+        });
+    });
+    it('400: GET responds with error, if invalid topic query is used', () => {
+      return request(app)
+        .get('/api/articles?topic=unknownTopic')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid topic query parameters');
         });
     });
   });
