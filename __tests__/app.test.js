@@ -152,7 +152,7 @@ describe('app', () => {
         .get('/api/articles/3')
         .expect(200)
         .then(({ body: { article } }) => {
-          expect(article).toEqual(
+          expect(article).toMatchObject(
             {
               article_id: 3,
               title: 'Eight pug gifs that remind me of mitch',
@@ -161,11 +161,22 @@ describe('app', () => {
               body: 'some gifs',
               created_at: '2020-11-03T08:12:00.000Z',
               votes: 0,
-              article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
+              article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
             }
           );
         });
     });
+    it('200: GET returns each object with comment_count property - total count of comments with this article_id', () => {
+      return request(app)
+        .get('/api/articles/1')
+        .expect(200)
+        .then(({ body }) => {
+          const { article } = body;
+
+          expect(article.hasOwnProperty('comment_count')).toBe(true);
+        });
+    });
+
     it('400: GET responds with error, when invalid article_id is passed', () => {
       return request(app)
         .get('/api/articles/not_valid_id')
@@ -174,6 +185,8 @@ describe('app', () => {
           expect(body.msg).toBe('Invalid Path Request');
         });
     });
+
+
     it('404: GET responds with error message, for valid, but not existing article_id', () => {
       return request(app)
         .get('/api/articles/1000')
@@ -190,6 +203,7 @@ describe('app', () => {
           expect(body.msg).toBe('Invalid sort query parameters');
         });
     });
+
 
     it('200: PATCH responds with updated article', () => {
       return request(app)
