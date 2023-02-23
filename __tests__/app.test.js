@@ -344,4 +344,15 @@ describe('app', () => {
         });
     });
   });
+
+  describe('/api/comments/:comment_id', () => {
+    it('204: Delete comment with given id, responds with staus and no content', () => {
+      return request(app)
+        .delete('/api/comments/1')
+        .expect(204)
+        .then((response) => {
+          expect(response.statusCode).toBe(204);
+        });
+    });
+  });
 });

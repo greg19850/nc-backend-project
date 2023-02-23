@@ -1,5 +1,5 @@
 const express = require('express');
-const { getTopics, getArticles, getArticleById, getCommentsByArticleId, addCommentToArticle, addVotesToArticle, getUsers } = require('./controllers/newsControllers');
+const { getTopics, getArticles, getArticleById, getCommentsByArticleId, addCommentToArticle, addVotesToArticle, getUsers, deleteComment } = require('./controllers/newsControllers');
 const { handlePSQL400Errors, handle500Status, handleCustomErrors } = require('./controllers/errorHandlingControllers');
 
 
@@ -17,6 +17,7 @@ app.post('/api/articles/:article_id/comments', addCommentToArticle);
 
 app.patch('/api/articles/:article_id', addVotesToArticle);
 
+app.delete('/api/comments/:comment_id', deleteComment);
 
 app.use('*', (req, res, next) => {
   res.status(404).send({ msg: 'Path not found' });
