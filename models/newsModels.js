@@ -38,10 +38,15 @@ exports.fetchArticles = (sort_by, order) => {
 
 exports.fetchArticleById = (article_id) => {
   return db.query(
-    `SELECT * FROM articles
-    WHERE article_id=$1
+    `SELECT articles.*, COUNT(comments.comment_id) as comment_count
+    FROM articles
+    LEFT JOIN comments 
+    ON comments.article_id = articles.article_id
+    WHERE articles.article_id=$1
+    GROUP BY articles.article_id
     `, [article_id]
   ).then((result) => {
+    console.log(result);
     if (result.rowCount === 0) {
       return Promise.reject('could not find article');
     }
