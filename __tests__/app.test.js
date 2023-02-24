@@ -3,7 +3,6 @@ const app = require('../app');
 const seed = require('../db/seeds/seed');
 const testData = require('../db/data/test-data/');
 const connection = require('../db/connection');
-const { json } = require('express');
 
 beforeEach(() => {
   return seed(testData);
@@ -26,7 +25,7 @@ describe('app', () => {
   });
 
   describe('/api', () => {
-    it('should ', () => {
+    it('200: GET responds with json file with all /api endpoints', () => {
       return request(app)
         .get('/api')
         .expect(200)
