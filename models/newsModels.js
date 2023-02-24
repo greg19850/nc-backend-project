@@ -1,6 +1,11 @@
 const db = require('../db/connection');
 const devArticles = require('../db/data/development-data/articles');
 const testArticles = require('../db/data/test-data/articles');
+const endpointsJSON = require('../endpoints.json');
+
+exports.fetchEndpointsFile = () => {
+  return endpointsJSON;
+};
 
 exports.fetchTopics = () => {
   return db.query(`SELECT * FROM topics`)
@@ -9,7 +14,6 @@ exports.fetchTopics = () => {
       return result.rows;
     });
 };
-
 
 exports.fetchArticles = (sort_by = 'created_at', order = 'DESC', topic) => {
   const validSortColumns = ['title', 'topic', 'author', 'body', 'created_at', 'votes', 'article_img_url'];
