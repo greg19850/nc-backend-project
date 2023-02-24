@@ -87,7 +87,6 @@ exports.fetchArticleById = (article_id) => {
     GROUP BY articles.article_id
     `, [article_id]
   ).then((result) => {
-    console.log(result);
     if (result.rowCount === 0) {
       return Promise.reject('could not find article');
     }
@@ -181,11 +180,17 @@ exports.fetchUsers = () => {
 
 exports.fetchCommentToDelete = (commentId) => {
 
-  return db.query(`
+  if (commentId !== undefined)
+    return db.query(`
   DELETE FROM comments
   WHERE comment_id = $1
   RETURNING *;
-  `, [commentId]).then((result) => {
-    return result.rows[0];
-  });
+  `, [commentId])
+      .then((result) => {
+        if (result.rowCount === 0) {
+          return Promise.reject('could not find comment');
+        }
+
+        return result.rows[0];
+      });
 };

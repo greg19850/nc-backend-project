@@ -407,12 +407,28 @@ describe('app', () => {
   });
 
   describe('/api/comments/:comment_id', () => {
-    it('204: Delete comment with given id, responds with staus and no content', () => {
+    it('204: DELETE comment with given id, responds with staus and no content', () => {
       return request(app)
         .delete('/api/comments/1')
         .expect(204)
         .then((response) => {
           expect(response.statusCode).toBe(204);
+        });
+    });
+    it('404: DELETE responds with error message, for valid, but not existing comment_id', () => {
+      return request(app)
+        .delete('/api/comments/1000')
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Comment Not Found!');
+        });
+    });
+    it('400: DELETE responds with error, when invalid comment_id is passed', () => {
+      return request(app)
+        .delete('/api/comments/invalid_comment')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid Path Request');
         });
     });
   });
