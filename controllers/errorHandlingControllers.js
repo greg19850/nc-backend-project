@@ -22,6 +22,8 @@ exports.handleCustomErrors = (err, req, res, next) => {
     res.status(404).send({ msg: 'Article Not Found!' });
   } else if (err === 'Invalid data type') {
     res.status(400).send({ msg: 'Bad Request' });
+  } else if (err === 'could not find comment') {
+    res.status(404).send({ msg: 'Comment Not Found!' });
   } else {
     next(err);
   }
