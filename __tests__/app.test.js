@@ -3,6 +3,7 @@ const app = require('../app');
 const seed = require('../db/seeds/seed');
 const testData = require('../db/data/test-data/');
 const connection = require('../db/connection');
+const { json } = require('express');
 
 beforeEach(() => {
   return seed(testData);
@@ -30,7 +31,16 @@ describe('app', () => {
         .get('/api')
         .expect(200)
         .then(({ body }) => {
-          expect(typeof body).toBe('object');
+          const jsonKeys = Object.keys(body);
+          const jsonValues = Object.values(body);
+
+          expect(jsonKeys.includes('GET /api/articles')).toBe(true);
+          expect(jsonValues).toHaveLength(6);
+          jsonValues.forEach(element => {
+            console.log(typeof element);
+            expect(element.hasOwnProperty('description')).toBe(true);
+          });
+
         });
     });
   });
