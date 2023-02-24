@@ -24,6 +24,26 @@ describe('app', () => {
     });
   });
 
+  describe('/api', () => {
+    it('200: GET responds with json file with all /api endpoints', () => {
+      return request(app)
+        .get('/api')
+        .expect(200)
+        .then(({ body }) => {
+          const jsonKeys = Object.keys(body);
+          const jsonValues = Object.values(body);
+
+          expect(jsonKeys.includes('GET /api/articles')).toBe(true);
+          expect(jsonValues).toHaveLength(6);
+          jsonValues.forEach(element => {
+            console.log(typeof element);
+            expect(element.hasOwnProperty('description')).toBe(true);
+          });
+
+        });
+    });
+  });
+
   describe('/api/topics', () => {
     it('200: GET returns array of topic objects, each with slug, and description properties', () => {
       return request(app)
@@ -204,7 +224,6 @@ describe('app', () => {
         });
     });
 
-
     it('200: PATCH responds with updated article', () => {
       return request(app)
         .patch('/api/articles/1')
@@ -263,7 +282,6 @@ describe('app', () => {
         .expect(200)
         .then(({ body }) => {
           const { comments } = body;
-
           expect(Array.isArray(comments)).toBe(true);
           expect(comments).toHaveLength(11);
 
@@ -392,7 +410,6 @@ describe('app', () => {
         .expect(200)
         .then(({ body }) => {
           const { users } = body;
-
           expect(Array.isArray(users)).toBe(true);
           expect(users).toHaveLength(4);
           users.forEach(user => {

@@ -1,4 +1,9 @@
 const { fetchTopics, fetchArticles, fetchArticleById, fetchCommentsByArticleId, checkArticleIdExist, insertNewComment, fetchUpdatedVotes, fetchUsers, fetchCommentToDelete } = require('../models/newsModels');
+const endpointsJSON = require('../endpoints.json');
+
+exports.getAllEndpoints = (req, res, next) => {
+  res.status(200).send(endpointsJSON);
+};
 
 exports.getTopics = (req, res, next) => {
   fetchTopics().then((topics) => {

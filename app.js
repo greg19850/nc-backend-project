@@ -1,5 +1,5 @@
 const express = require('express');
-const { getTopics, getArticles, getArticleById, getCommentsByArticleId, addCommentToArticle, addVotesToArticle, getUsers, deleteComment } = require('./controllers/newsControllers');
+const { getTopics, getArticles, getArticleById, getCommentsByArticleId, addCommentToArticle, addVotesToArticle, getUsers, deleteComment, getAllEndpoints } = require('./controllers/newsControllers');
 const { handlePSQL400Errors, handle500Status, handleCustomErrors } = require('./controllers/errorHandlingControllers');
 
 
@@ -7,6 +7,7 @@ const app = express();
 
 app.use(express.json());
 
+app.get('/api', getAllEndpoints);
 app.get('/api/topics', getTopics);
 app.get('/api/articles', getArticles);
 app.get('/api/articles/:article_id', getArticleById);
