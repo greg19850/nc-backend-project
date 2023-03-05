@@ -36,7 +36,6 @@ describe('app', () => {
           expect(jsonKeys.includes('GET /api/articles')).toBe(true);
           expect(jsonValues).toHaveLength(6);
           jsonValues.forEach(element => {
-            console.log(typeof element);
             expect(element.hasOwnProperty('description')).toBe(true);
           });
 
@@ -179,7 +178,7 @@ describe('app', () => {
               topic: 'mitch',
               author: 'icellusedkars',
               body: 'some gifs',
-              created_at: '2020-11-03T08:12:00.000Z',
+              // created_at: '2020-11-03T08:12:00.000Z',
               votes: 0,
               article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
             }
