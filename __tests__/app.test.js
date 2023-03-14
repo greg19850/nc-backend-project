@@ -191,7 +191,6 @@ describe('app', () => {
         .expect(200)
         .then(({ body }) => {
           const { article } = body;
-
           expect(article.hasOwnProperty('comment_count')).toBe(true);
         });
     });
@@ -225,11 +224,11 @@ describe('app', () => {
 
     it('200: PATCH responds with updated article', () => {
       return request(app)
-        .patch('/api/articles/1')
+        .patch('/api/articles/3')
         .send({ inc_votes: 100 })
         .expect(200)
         .then(({ body }) => {
-          console.log(body);
+
           const { article } = body;
 
           expect(article.votes).toBe(100);
@@ -237,7 +236,7 @@ describe('app', () => {
     });
     it('200: PATCH responds with original votes decremented, if negative value is send', () => {
       return request(app)
-        .patch('/api/articles/1')
+        .patch('/api/articles/3')
         .send({ inc_votes: -50 })
         .expect(200)
         .then(({ body }) => {
