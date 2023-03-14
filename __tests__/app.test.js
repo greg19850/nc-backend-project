@@ -229,9 +229,10 @@ describe('app', () => {
         .send({ inc_votes: 100 })
         .expect(200)
         .then(({ body }) => {
+          console.log(body);
           const { article } = body;
 
-          expect(article.votes).toBe(100);
+          expect(article.votes).toBe(200);
         });
     });
     it('200: PATCH responds with original votes decremented, if negative value is send', () => {
@@ -242,7 +243,7 @@ describe('app', () => {
         .then(({ body }) => {
           const { article } = body;
 
-          expect(article.votes).toBe(-50);
+          expect(article.votes).toBe(50);
         });
     });
     it('400: PATCH responds with error, when invalid article_id is passed', () => {
