@@ -99,7 +99,7 @@ exports.fetchArticleById = (article_id) => {
   });
 };
 
-exports.fetchCommentsByArticleId = (id, sort_by) => {
+exports.fetchCommentsByArticleId = (id, sort_by, order = 'DESC') => {
 
   if (sort_by && !['created_at'].includes(sort_by)) {
     return Promise.reject('Invalid sort query');
@@ -114,7 +114,7 @@ exports.fetchCommentsByArticleId = (id, sort_by) => {
   }
 
   if (sort_by) {
-    queryString += ` ORDER BY ${sort_by}`;
+    queryString += ` ORDER BY ${sort_by} ${order}`;
   }
 
   return db.query(queryString, queryParams)
